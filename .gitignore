@@ -37,3 +37,12 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# R project files
+/*.Rproj
+/renv.lock
+
+# data files
+/*.rds
+/*.h5ad
+/*.h5Seurat
