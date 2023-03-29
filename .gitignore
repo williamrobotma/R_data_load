@@ -40,9 +40,9 @@ vignettes/*.pdf
 
 # R project files
 /*.Rproj
-/renv.lock
 
 # data files
 /*.rds
 /*.h5ad
 /*.h5Seurat
+/*.curltmp
