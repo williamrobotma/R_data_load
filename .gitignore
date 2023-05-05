@@ -43,6 +43,11 @@ vignettes/*.pdf
 
 # data files
 /*.rds
+/*.h5
 /*.h5ad
 /*.h5Seurat
 /*.curltmp
+/*.zip
+/*.csv
+/spotless/
+/Code/

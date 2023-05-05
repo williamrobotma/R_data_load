@@ -1,5 +1,5 @@
-# renv::init(bare=TRUE)
-# renv::install(c("Seurat", "mojaveazure/seurat-disk", "satijalab/seurat-data"))
+# renv::init(bare=TRUE, bioconductor = TRUE)
+# renv::install(c("Seurat", "mojaveazure/seurat-disk", "satijalab/seurat-data", "bioc::rhdf5"))
 # renv::snapshot()
 
 library(Seurat)
