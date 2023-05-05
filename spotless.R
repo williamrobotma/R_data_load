@@ -40,3 +40,8 @@ for (name in names(gs_1_seurat)) {
   unlink(file.path(gs_1_dir, paste(name, ".h5seurat", sep="")))
 }
 
+gs_ref_dir <- "./spotless/reference/"
+gs1_ref <- readRDS(file.path(gs_ref_dir, "gold_standard_1.rds"))
+SaveH5Seurat(gs1_ref, filename = file.path(gs_ref_dir, "gold_standard_1.h5Seurat"))
+Convert(file.path(gs_ref_dir, "gold_standard_1.h5Seurat"), dest = "h5ad")
+unlink(file.path(gs_ref_dir, "gold_standard_1.h5Seurat"))
