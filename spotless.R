@@ -5,43 +5,61 @@ library(SeuratDisk)
 # library(feather)
 library(rlist)
 
-gs_1_dir <- "./spotless/gold_standard_1"
+standards_dir <- "./spotless/standards/"
 
-gs_1_fnames <- list.files(gs_1_dir, pattern="*.rds")
-
-gs_1_slides <- list()
-for (name in gs_1_fnames) {
-  gs_1_slides[[tools::file_path_sans_ext(name)]] <- readRDS(file.path(gs_1_dir, name))
-}
-
-gs_1_slides
-gs_1_seurat <- list()
-for (name in names(gs_1_slides)) {
-  metadata <- list()
-  for (subname in names(gs_1_slides[[name]])) {
-    if (subname == "counts") {
-      counts <- gs_1_slides[[name]][[subname]]
-    }
-    else if (subname != "dataset_properties") {
-      i<-length(metadata) + 1
-      metadata[[i]] <- as.data.frame(gs_1_slides[[name]][[subname]])
-      # print(metadata[[i]])
-      # print(colnames(metadata[[i]]))
-      colnames(metadata[[i]]) <- paste(subname, colnames(metadata[[i]]), sep=".")
-    }
+conv_2_h5ad <- function(gs_dir) {
+  gs_fnames <- list.files(gs_dir, pattern="*.rds")
+  
+  gs_slides <- list()
+  for (name in gs_fnames) {
+    gs_slides[[tools::file_path_sans_ext(name)]] <- readRDS(file.path(gs_dir, name))
   }
-  gs_1_seurat[[name]] <- CreateSeuratObject(counts, meta.data = list.cbind(metadata))
+  
+  gs_slides
+  gs_seurat <- list()
+  for (name in names(gs_slides)) {
+    print(name)
+    metadata <- list()
+    for (subname in names(gs_slides[[name]])) {
+      print(subname)
+      if (subname == "counts") {
+        counts <- gs_slides[[name]][[subname]]
+      }
+      else if (subname != "dataset_properties") {
+        i<-length(metadata) + 1
+        metadata[[i]] <- as.data.frame(gs_slides[[name]][[subname]])
+        colnames(metadata[[i]]) <- paste(subname, colnames(metadata[[i]]), sep=".")
+      }
+    }
+    gs_seurat[[name]] <- CreateSeuratObject(counts, meta.data = list.cbind(metadata))
+  }
+  
+  
+  for (name in names(gs_seurat)) {
+    SaveH5Seurat(gs_seurat[[name]], filename = file.path(gs_dir, paste(name, ".h5Seurat", sep="")), overwrite = TRUE)
+    Convert(file.path(gs_dir, paste(name, ".h5Seurat", sep="")), dest = "h5ad", overwrite = TRUE)
+    unlink(file.path(gs_dir, paste(name, ".h5Seurat", sep="")))
+  }
+}
+
+gs_dirs <- list.dirs(standards_dir)
+for (gs_dir in gs_dirs) {
+  if (basename(gs_dir) != "reference") {
+    print("Converting")
+    print(gs_dir)
+    conv_2_h5ad(gs_dir)
+  }
 }
 
 
-for (name in names(gs_1_seurat)) {
-  SaveH5Seurat(gs_1_seurat[[name]], filename = file.path(gs_1_dir, paste(name, ".h5seurat", sep="")), overwrite = TRUE)
-  Convert(file.path(gs_1_dir, paste(name, ".h5seurat", sep="")), dest = "h5ad", overwrite = TRUE)
-  unlink(file.path(gs_1_dir, paste(name, ".h5seurat", sep="")))
+gs_ref_dir <- "./spotless/standards/reference/"
+gs_refnames <- list.files(gs_ref_dir, pattern="*.rds")
+for (name in gs_refnames) {
+  name_sans_ext <- tools::file_path_sans_ext(name)
+  name_seurat <- paste(name_sans_ext, ".h5Seurat", sep="")
+  gs_ref <- readRDS(file.path(gs_ref_dir, name))
+  SaveH5Seurat(gs_ref, filename = file.path(gs_ref_dir, name_seurat), overwrite = TRUE)
+  Convert(file.path(gs_ref_dir, name_seurat), dest = "h5ad", overwrite = TRUE)
+  unlink(file.path(gs_ref_dir, name_seurat))
 }
 
-gs_ref_dir <- "./spotless/reference/"
-gs1_ref <- readRDS(file.path(gs_ref_dir, "gold_standard_1.rds"))
-SaveH5Seurat(gs1_ref, filename = file.path(gs_ref_dir, "gold_standard_1.h5Seurat"))
-Convert(file.path(gs_ref_dir, "gold_standard_1.h5Seurat"), dest = "h5ad")
-unlink(file.path(gs_ref_dir, "gold_standard_1.h5Seurat"))
