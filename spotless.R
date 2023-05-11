@@ -5,10 +5,21 @@ library(SeuratDisk)
 # library(feather)
 library(rlist)
 
+
+if (!dir.exists("./spotless")){
+  dir.create("./spotless")
+  url <- "https://zenodo.org/record/7781323/files/standards.tar.gz"
+  if (!file.exists(basename(url))) {
+    curl::curl_download(url, basename(url))
+  }
+  untar(basename(url), "./spotless")
+}
+
+
 standards_dir <- "./spotless/standards/"
 
 conv_2_h5ad <- function(gs_dir) {
-  gs_fnames <- list.files(gs_dir, pattern="*.rds")
+  gs_fnames <- list.files(gs_dir, pattern=".rds")
   
   gs_slides <- list()
   for (name in gs_fnames) {
@@ -42,7 +53,7 @@ conv_2_h5ad <- function(gs_dir) {
   }
 }
 
-gs_dirs <- list.dirs(standards_dir)
+gs_dirs <- grep("gold", list.dirs(standards_dir), value=TRUE)
 for (gs_dir in gs_dirs) {
   if (basename(gs_dir) != "reference") {
     print("Converting")
@@ -53,7 +64,7 @@ for (gs_dir in gs_dirs) {
 
 
 gs_ref_dir <- "./spotless/standards/reference/"
-gs_refnames <- list.files(gs_ref_dir, pattern="*.rds")
+gs_refnames <- list.files(gs_ref_dir, pattern="gold*.rds")
 for (name in gs_refnames) {
   name_sans_ext <- tools::file_path_sans_ext(name)
   name_seurat <- paste(name_sans_ext, ".h5Seurat", sep="")
