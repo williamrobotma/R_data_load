@@ -5,18 +5,20 @@ library(SeuratDisk)
 # library(feather)
 library(rlist)
 
+standards_dir <- "./spotless/standards/"
 
-if (!dir.exists("./spotless")){
-  dir.create("./spotless")
-  url <- "https://zenodo.org/record/7781323/files/standards.tar.gz"
-  if (!file.exists(basename(url))) {
-    curl::curl_download(url, basename(url))
-  }
-  untar(basename(url), "./spotless")
+if (!dir.exists(standards_dir)){
+  dir.create(standards_dir)
 }
 
+url <- "https://zenodo.org/record/7781323/files/standards.tar.gz"
+if (!file.exists(basename(url)) && !dir.exists(file.path(standards_dir, "reference/"))) {
+  curl::curl_download(url, basename(url))
+}
 
-standards_dir <- "./spotless/standards/"
+if (!dir.exists(file.path(standards_dir, "reference/"))) {
+  untar(basename(url), exdir=standards_dir)
+}
 
 conv_2_h5ad <- function(gs_dir) {
   gs_fnames <- list.files(gs_dir, pattern=".rds")
@@ -64,7 +66,7 @@ for (gs_dir in gs_dirs) {
 
 
 gs_ref_dir <- "./spotless/standards/reference/"
-gs_refnames <- list.files(gs_ref_dir, pattern="gold*.rds")
+gs_refnames <- list.files(gs_ref_dir, pattern="^gold.*.rds$")
 for (name in gs_refnames) {
   name_sans_ext <- tools::file_path_sans_ext(name)
   name_seurat <- paste(name_sans_ext, ".h5Seurat", sep="")
