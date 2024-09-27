@@ -16,7 +16,7 @@ if (!dir.exists(standards_dir)) {
 
 url <- "https://zenodo.org/record/7781323/files/standards.tar.gz"
 if (!file.exists(basename(url)) && !dir.exists(file.path(standards_dir, "reference/"))) {
-  curl::curl_download(url, basename(url))
+  curl::curl_download(url, basename(url), quiet=FALSE)
 }
 
 if (!dir.exists(file.path(standards_dir, "reference/"))) {
@@ -46,14 +46,21 @@ conv_2_h5ad <- function(gs_dir) {
         colnames(metadata[[i]]) <- paste(subname, colnames(metadata[[i]]), sep = ".")
       }
     }
+    
     gs_seurat[[name]] <- CreateSeuratObject(counts, meta.data = list.cbind(metadata))
+
+    # make it a SeuratV4 object so that SeuratDisk works
+    gs_seurat[[name]][["RNA"]] <- CreateAssayObject(counts = gs_seurat[[name]][["RNA"]]$counts)
   }
 
 
+  
   for (name in names(gs_seurat)) {
-    SaveH5Seurat(gs_seurat[[name]], filename = file.path(gs_dir, paste(name, ".h5Seurat", sep = "")), overwrite = TRUE)
-    Convert(file.path(gs_dir, paste(name, ".h5Seurat", sep = "")), dest = "h5ad", overwrite = TRUE)
-    unlink(file.path(gs_dir, paste(name, ".h5Seurat", sep = "")))
+    out_path <- file.path(gs_dir, paste(name, ".h5Seurat", sep = ""))
+    print(out_path)
+    SaveH5Seurat(gs_seurat[[name]], filename = out_path, overwrite = TRUE)
+    Convert(out_path, dest = "h5ad", overwrite = TRUE)
+    unlink(out_path)
   }
 }
 
@@ -77,3 +84,4 @@ for (name in gs_refnames) {
   Convert(file.path(gs_ref_dir, name_seurat), dest = "h5ad", overwrite = TRUE)
   unlink(file.path(gs_ref_dir, name_seurat))
 }
+
