@@ -1,10 +1,11 @@
-# renv::init(bare=TRUE, bioconductor = TRUE)
-# if (!require("BiocManager", quietly = TRUE))
-#   renv::install("BiocManager")
-# renv::install("bioc::BiocVersion")
-# ################################################################################
-# renv::install(c("Seurat", "mojaveazure/seurat-disk", "satijalab/seurat-data", "bioc::rhdf5", "jsonlite", "bioc::spatialLIBD", "rlist"))
-# renv::snapshot()
+renv::init(bare=TRUE, bioconductor = TRUE)
+if (!require("BiocManager", quietly = TRUE))
+  renv::install("BiocManager")
+renv::install("bioc::BiocVersion")
+################################################################################
+renv::install("gitcreds")
+renv::install(c("Seurat", "mojaveazure/seurat-disk", "satijalab/seurat-data", "bioc::rhdf5", "jsonlite", "bioc::spatialLIBD", "rlist", "dmcable/spacexr"))
+renv::snapshot()
 
 library(Seurat)
 library(SeuratData)

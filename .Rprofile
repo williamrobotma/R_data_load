@@ -1,5 +1,8 @@
+source("~/.Rprofile")
 source("renv/activate.R")
-r <- getOption("repos")
-r["CRAN"] <- "https://cloud.r-project.org"
-options(repos = r)
-options(Ncpus = parallel::detectCores())
+# r <- getOption("repos")
+# r["CRAN"] <- "https://cloud.r-project.org"
+# options(repos = r)
+# options(Ncpus = parallel::detectCores())
+# 
+# rm(r)
