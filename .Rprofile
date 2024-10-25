@@ -4,5 +4,5 @@ source("renv/activate.R")
 # r["CRAN"] <- "https://cloud.r-project.org"
 # options(repos = r)
 # options(Ncpus = parallel::detectCores())
-# 
+#
 # rm(r)
