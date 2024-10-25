@@ -15,7 +15,7 @@ url <- "https://zenodo.org/records/7750930/files/data.zip"
 dest_file <- file.path(data_dir, basename(url))
 dest_dir <- file.path(data_dir, "data/")
 if (!file.exists(dest_file) && !dir.exists(dest_dir)) {
-    curl::curl_download(url, dest_file, quiet=FALSE)
+    curl::curl_download(url, dest_file, quiet = FALSE)
 }
 
 if (!dir.exists(dest_dir)) {
@@ -27,7 +27,7 @@ gs_fnames <- list.files(dest_dir, pattern = ".rds")
 
 gs_slides <- list()
 for (name in gs_fnames) {
-    gs_slides[[tools::file_path_sans_ext(gsub('(.*)_\\w+', '\\1', name))]] <- readRDS(file.path(dest_dir, name))
+    gs_slides[[tools::file_path_sans_ext(gsub("(.*)_\\w+", "\\1", name))]] <- readRDS(file.path(dest_dir, name))
 }
 
 gs_seurat <- list()
@@ -51,20 +51,17 @@ for (name in names(gs_slides)) {
     #     assay <- mainExpName(gs_slides[[name]])
     # }
     counts <- "counts"
-    data<-"logcounts"
+    data <- "logcounts"
     if (!("logcounts" %in% names(gs_slides[[name]]@assays))) {
-        data<-NULL
+        data <- NULL
     }
     if ("counts" %in% names(gs_slides[[name]]@assays)) {
-        gs_seurat[[name]] <- as.Seurat(gs_slides[[name]], counts =counts, data=data, assay=NULL)
+        gs_seurat[[name]] <- as.Seurat(gs_slides[[name]], counts = counts, data = data, assay = NULL)
         print("done as seurat")
         # make it a SeuratV4 object so that SeuratDisk works
         assay <- gs_seurat[[name]]@active.assay
         gs_seurat[[name]][[assay]] <- CreateAssayObject(counts = gs_seurat[[name]][[assay]]$counts)
     }
-
-
-
 }
 
 
@@ -76,4 +73,3 @@ for (name in names(gs_seurat)) {
     Convert(out_path, dest = "h5ad", overwrite = TRUE)
     unlink(out_path)
 }
-
